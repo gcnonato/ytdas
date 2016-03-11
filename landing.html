@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<head>
+    <title>INDMUSIC 300 CHANNEL ANALYTICS DASHBOARD</title>
+    <meta name="viewport" content="width=device-width, initial-scale = 1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="INDMUSIC PARTNER DASHBOARD view your reports and Youtube analytics.">
+    
+    <script src="/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="/bower_components/paper-shadow/paper-shadow.html" />
+    <link rel="import" href="/bower_components/paper-button/paper-button.html">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Sans" />
+    <link href="http://fonts.googleapis.com/css?family=Roboto:400,100" rel="stylesheet" type="text/css">
+
+    <style>
+        .login{
+            position: absolute;
+            left: 50%;
+            top: 30%;
+            text-align: center;        
+            background-color: #404040;
+            width:546px;
+            height:400px;
+            margin-left: -273px; /*half width*/
+            margin-top: -132px; /*half height*/
+            display:none;
+            }
+        #title{
+            font-size:2.5em;color:white;
+        }
+        #loginbutton{
+                top:250px;left:41%;position:absolute
+            }
+        @keyframes spin { 30% { -webkit-transform: rotateY(20deg); transform:rotateY(20deg); } }
+        .colored{
+            background-color:#3071A9;
+            color:white;
+            font-family: 'Roboto', sans-serif;
+        }
+        .back{
+            position: fixed;
+            width:100%;
+            z-index: -1;
+            /*background-color: #343434;*/
+            background-color:#F0F0F0;
+            height:1080px;
+            top:45%;
+            left:-2px;
+        }
+        body{
+            font-family: 'Roboto', sans-serif;
+            font-weight: 100;
+        }
+        @media (max-width:650px){
+            .login{
+                width:290px;
+                left: 0;
+                right:0;
+                top:80px;
+                position:absolute;
+                margin: 0 auto;
+                
+            }
+            #title{
+                font-size:1.5em;color:white
+            }
+            #loginbutton{
+                top:250px;left:33%;position:absolute
+            }
+        }
+    </style>
+</head>
+<body style="background-color:#E5E5E5">
+     <div class="back">
+    </div>
+    <center class="login" id="login">
+        <paper-shadow class="heading" z="5" animated="true">
+            <div style="height:50%;background-color:#CF0605">
+                <img id="art" height="100" width="100" src="">
+                <p id="title">Analytics Dashboard</p>
+            </div>
+            <div style="height:50%">
+               <div id="loginbutton">
+                    <paper-button raised class="colored" onclick="auth()">Login</paper-button>
+                </div> 
+            </div>
+        </paper-shadow>
+    </center>
+</body>
+<script>
+    function auth(){
+        window.location.assign('/auth')
+    }
+
+     window.addEventListener('polymer-ready', function(e) {
+         
+      $.get('/header').success(function(data){
+          
+          $('#art').attr('src',data.client.logo);
+          
+      })
+         
+         
+      $('#login').fadeIn();
+         
+    });
+
+</script>

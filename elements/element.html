@@ -1,0 +1,485 @@
+<!-- 
+    CREATING THIS ELEMENT TO MAKE A TILED PANEL OUT OF AN AUTHENTICATED REQUEST USING A CHANNEL ID.
+
+    DISPLAYS PAPER ELEMTENTS FOR EACH CHANNEL SHOWING STATS
+    PAPER ELEMENTS ARE CLICKABLE DISPLAYING A D3 CHART OF THE CHANNEL'S WEEKLY VIEWS IN A POP UP DIALOG
+
+    ROADMAP:
+    MAKE THIS FULLY RESPONSIVE
+-->
+
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-shadow/paper-shadow.html" />
+<link rel="import" href="/bower_components/core-ajax/core-ajax.html" />
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/core-icons/core-icons.html" />
+<link rel="import" href="/bower_components/paper-fab/paper-fab.html" />
+<link rel="import" href="/bower_components/paper-spinner/paper-spinner.html" />
+<link rel="import" href="/bower_components/paper-shadow/paper-shadow.html" />
+
+<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/bower_components/d3/d3.js"></script>
+<link href="http://fonts.googleapis.com/css?family=Roboto:400,100" rel="stylesheet" type="text/css" />
+
+
+<polymer-element name="three-hundred">
+  <template>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .title {
+            font-size:1.5em;color:white
+        }
+        
+        paper-shadow {
+            width: 300px;
+            display: inline-block;
+            margin-top: 20px;
+            float:left;
+            margin-left: 20px;
+            font-family: 'Roboto', sans-serif;
+            color: #333333;
+            transition: all .2s ease-in-out;
+        }
+        paper-shadow:hover {
+            transform: scale(1.05); 
+        }
+        img {
+            border-radius: 100px;
+            border: solid 2px #333333;
+        }
+        #stats {
+            font-size: .8em;
+            margin-top: -25px;
+        }
+        #title {
+            padding-top: 70px;
+            font-size:1.5em;
+        }
+        #heading {
+            font-size: 2.5em;
+        }
+        paper-button {
+            background: #4285f4;
+        }
+        
+        .axis path, .axis line
+        {
+            fill: none;
+            stroke: #777;
+            shape-rendering: crispEdges;
+        } 
+        
+        .axis text
+        {
+            font-family: 'Arial';
+            font-size: 13px;
+        }
+        .tick
+        {
+            stroke-dasharray: 1, 2;
+        }
+        .bar
+        {
+            fill: FireBrick;
+        }
+        
+        .scroller {
+            text-align: center
+        }
+        .scroller h1 {
+            text-transform: capitalize;
+        }
+        
+        
+        #hero1 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 300px;
+            background-color: orange;
+          }
+          #hero2 {
+            position: absolute;
+            top: 200px;
+            left: 300px;
+            width: 300px;
+            height: 300px;
+            background-color: orange;
+          }
+          #bottom1, #bottom2 {
+            position: absolute;
+            bottom: 0;
+            top: 0;
+            left: 0;
+            height: 50px;
+          }
+          #bottom1 {
+            background-color: blue;
+          }
+          #bottom2 {
+            background-color: green;
+          }
+        .card {
+        height: 400px;
+        border-radius: 3px;
+        text-align: start;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      }
+        .card-left {
+        width: 400px;
+      }
+        tbody div{
+        overflow:scroll;
+        height:100px;
+        color:red;
+    }
+       
+      
+      </style>
+      <core-ajax auto url="/getchan" on-core-response="{{response}}"></core-ajax>
+      
+      <paper-dialog id="dialog" bind="{{selected}}" backdrop autoclosedisabled transition="core-transition-center">
+          
+          <div class="card" layout horizontal style="height: 400px;
+        border-radius: 3px;
+        text-align: start;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+            <div class="card-left" style="background-color:#eee;
+                                          width: 400px
+                                          font-family: 'Roboto', sans-serif" hero>
+                <div id="background" style="position: absolute;z-index: -1;top: 0;bottom: 0;left: 0;right: 0;background: url({{selected.image}}) center center fixed no-repeat;opacity: .4;width: 100%;height: 100%;background-size: cover;"></div>
+                <center>
+                    <img style="border-radius: 100px;border: solid 2px #333333;position:absolute;top:80px;margin-left: auto;
+margin-right: auto;
+left: 0;
+right: 200px;" height="70" width="70" src="{{selected.image}}" />
+                </center>
+                <svg id="visualisation" width="400" height="300" style="margin-top:130px;"></svg>  
+            </div>
+            <div class="card-right" style="padding: 24px;width:300px;" flex>
+                <div layout horizontal center>
+                  <div>
+                    <div class="card-icon" style="background:#eee;"></div>
+                  </div>
+                  <div flex style="overflow:scroll;height:350px;">
+                      <center>
+                          <div style="position:absolute:left:20px">
+                            <paper-spinner role="progressbar" id="analyticsSpinner" style="width:100px;height:100px"></paper-spinner>
+                          </div>
+                          <div class="card-album-title" style="font-family: 'Roboto', sans-serif;font-size:2em">{{selected.name}}</div>
+                          
+                      </center>
+                      <div id="videoTable" style="">
+                              
+                            <table style="font-family: 'Roboto', sans-serif" cellspacing="10">
+                                <thead>
+                                    <tr>
+                                        <th style="border:1px solid black">Video Title</th>
+                                        <th style="border:1px solid black">Date Uploaded</th>
+                                        <th style="border:1px solid black">Total Views</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="font-size:.8em;">
+                                    
+                                    <template repeat="{{i in selected.videos}}">
+                                        <tr>
+                                            <td style="max-width:100px"><a href="{{i.url}}" target="_blank">{{i.title}}</a></td>
+                                            <td align="center">{{i.published}}</td>
+                                            <td align="center">{{i.views}}</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                          </div>
+                    <div class="card-album-artist">{{selectedAlbum.artist}}</div>
+                  </div>
+                </div>
+            </div>
+            
+          <paper-fab icon="close" style="background: blue;float:right;margin-top:340px" on-tap="{{closediag}}"></paper-fab>
+          </div>
+          
+        </paper-dialog>
+        <paper-dialog id="authErr" backdrop autoclosedisabled transition="core-transition-center" style="">
+            <paper-shadow class="heading" z="5" animated="true" style="">
+                <center>
+                    <div style="height:50%;background-color:#CF0605;padding:20px">
+                        <img id="art" height="100" width="100" src="http://300ent.com/wp-content/themes/300/assets/img/300_logo_black.svg">
+                        <p class="title" style="color:white;font-size:1.5em;font-family: 'Roboto', sans-serif">You are not authenticated in the Three Hundred CMS</p>
+                    </div>
+                </center>
+            </paper-shadow>
+        </paper-dialog>
+      <div style="position: absolute;
+    top: 60%;
+    left: 50%;
+    width: 400px;
+    height: 300px;
+    margin-top: -150px;
+    margin-left: -200px;">
+        <paper-spinner role="progressbar" id="spinner" style="width:200px;height:200px"></paper-spinner>
+      </div>
+      <div style="margin:0 auto; width:1000px">
+      <template repeat="{{i in items}}" style="width:300px">
+        <paper-shadow z="3" on-tap="{{toggleDialog}}" data-id="{{i.id}}" id="{{i.id}}">
+            <div style="height:75px;background-color:#CF0605">
+                <center style="padding-top:20px">
+                    <img height="100" width="100" src="{{i.snippet.thumbnails.high.url}}" />
+                </center>
+            </div>
+            <div style="height:200px; background-color:#eee">
+               <span></span>
+                <div id="title">
+                    <center>
+                        <p>{{i.snippet.title}}</p>
+                    </center>
+                </div>
+                <div>
+                    <center>
+                        <table id="stats" cellspacing="20">
+                            <tr>
+                                <th>Views</th>
+                                <th>Subscribers</th>
+                                <th>Comments</th>
+                            </tr>
+                            <tr>
+                                <td>{{i.statistics.viewCount}}</td>
+                                <td>{{i.statistics.subscriberCount}}</td>
+                                <td>{{i.statistics.commentCount}}</td>
+                            </tr>
+                        </table>
+                    </center>
+                </div>
+            </div>
+            
+      </paper-shadow>
+      </template>
+      </div>
+      
+  </template>
+    <script>
+    
+    Polymer('three-hundred', {
+        items: [],
+        
+      ready: function() {
+        //...
+
+          //MAKE API CALL
+          
+          this.$.spinner.active = true;
+
+
+      },
+      selected: {},
+      response: function(data) {
+          
+          var parsed = JSON.parse(data.detail.response);
+          
+          /*
+            ADD ERROR CHECK FOR PEOPLE WHO ARE NOT AUTHENTICATED TO THE THREEHUNDRED CMS
+            
+            FOR NOW REDIRECT TO THE LANDING PAGE
+          */
+          
+          if(parsed.items === undefined) {
+              
+              //window.location.assign('/');
+              
+              console.log(this.$)
+              
+              this.$.authErr.toggle();
+              
+              setTimeout(function() {
+                  
+                  window.location.assign('/');
+                  
+              },2000)
+              
+          }
+          
+          
+          //console.log(this.$)
+          this.$.spinner.active = false;
+          
+          //SORT ARTISTS BY REVENUE
+          parsed.items.sort(function(a, b) {
+              return parseFloat(b.statistics.viewCount) - parseFloat(a.statistics.viewCount);
+            });
+          
+          //PASS THE SORTED ARRAY TO ITEMS
+          this.items = parsed.items;
+      },
+      closediag: function() {
+          var hi = this.$;
+          this.$.dialog.toggle();
+          
+          //DELETE THE CONTENTS OF THE 
+          this.selected.videos = [];
+          d3.select(hi.visualisation).select('svg').remove();
+      },
+      alertAuth: function () {
+        
+          //ALERT THAT YOU DONT HAVE THE CREDENTIALS AND REDIRECT TO LANDING PAGE
+          
+      },
+      getAnalytics: function() {
+          
+          //GET ALL OF THE VIDEOS FROM A CHANNEL
+          
+          
+          
+          
+          //PASS THE CHANNEL ID - FROM THAT FUNCTION WE WILL GET THE LAST WEEK'S WORTH OF ANALYTICS
+          
+          var url = "/getdetails",
+              vidurl = "/getvideos",
+              id = this.selected.id,
+              
+              /*
+                NOTICE THIS VARIABLE - THIS ENABLES US TO SELECT ELEMENTS FOR USE IN D3.
+              */
+              elementGrab = this.$,
+              hi = this.$,
+              selected = this.selected;
+          
+              hi.analyticsSpinner.active = true;
+          $.ajax({
+              method: "PUT",
+              url: url,
+              data: {id:id},
+              success: function(data){
+                  
+                  hi.analyticsSpinner.active = false;
+            
+                  /*
+                    STORE THE VIDEO INFO IN THE SELECTED
+                  */
+                  
+                  selected.videos = data.videos;
+                  
+                  selected.videos.sort(function (a, b) {
+                      return Date.parse(b.published) - Date.parse(a.published)
+                  })
+                  
+                  
+                  d3.select(hi.visualisation).select('svg').remove();
+                  
+                
+                  var parse = JSON.parse(data.channelStats);
+                  var rows = parse.rows;
+                  
+                  /*ERROR CATCH AUTHENTICATION ERRORS*/
+                  
+                  if (parse.error !== undefined) {
+                      console.log(parse)
+                      //window.location.assign('/auth');
+                      
+                  }
+                  
+                  
+                  var data = [];
+                  
+                  /*
+                    WE HAD TO CREATE AN OBJECT ARRAY IN ORDER TO PROPERLY IDENTIFY THE DATE
+                    
+                    USING THE RAW INFORMATION (DATA) RETURNED ERRORS
+                  */
+                  for(i in rows) {
+                      data.push({date:rows[i][0],total:rows[i][1]});
+                  }
+                  
+                  var width = 400,
+                      height = 250,
+                      margin = {
+                          top: 20,
+                          right: 20,
+                          bottom: 20,
+                          left: 80
+                        };
+                  
+                  /*
+                  
+                  THIS DRAWS THE LINE - NOTICE THAT WE ARE NOT USING THE d3.timedate FUNCTION - 
+                  THIS IS WORKING WITH PLAIN JAVASCRIPT
+                  
+                  */
+                var line = d3.svg.line()
+                    .x(function(d) { return x(new Date(d.date)); })
+                    .y(function(d) { return y(d.total); });
+                  
+                var x = d3.time.scale()
+                    .domain([new Date(data[0].date), d3.time.day.offset(new Date(data[data.length - 1].date), 1)])
+                    .rangeRound([0, width - margin.left - margin.right]);
+                  
+                var y = d3.scale.linear()
+                    .domain([0, d3.max(data, function(d) { return d.total; })])
+                    .range([height - margin.top - margin.bottom, 0]);
+
+                var xAxis = d3.svg.axis()
+                    .scale(x)
+                    .orient('bottom')
+                    .ticks(d3.time.days, 2)
+                    .tickFormat(d3.time.format('%m-%d'))
+                    .tickSize(1)
+                    .tickPadding(8);
+
+                var yAxis = d3.svg.axis()
+                    .scale(y)
+                    .ticks(7)
+                    .orient('left')
+                    .tickSize(1)
+                    .tickPadding(8);
+                
+                  var svg = d3.select(elementGrab.visualisation).append('svg')
+                    .attr('class', 'chart')
+                    .attr('width', width)
+                    .attr('height', height)
+                    .append('g')
+                    .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+
+                svg.selectAll('.chart')
+                    .data(data)
+                    .enter().append('path')
+                    .attr('class', 'line')
+                    .attr('stroke', 'blue')
+                    .attr('stroke-width', 1)
+                    .attr('fill', 'none')
+                    .attr("d", line(data));
+
+                svg.append('g')
+                    .attr('class', 'x axis')
+                    .attr('transform', 'translate(0, ' + (height - margin.top - margin.bottom) + ')')
+                    .call(xAxis);
+
+                svg.append('g')
+                  .attr('class', 'y axis')
+                  .call(yAxis); 
+              }
+          })
+      },
+      toggleDialog: function(e,detail,sender) {
+          
+          var root = sender.templateInstance.model.i;
+          this.selected.id = root.id;
+          this.selected.name = root.snippet.title;
+          this.selected.image = root.snippet.thumbnails.high.url;
+          this.getAnalytics(this.id);
+          this.$.dialog.toggle();
+          
+      }
+    });
+
+    
+  </script>
+</polymer-element>

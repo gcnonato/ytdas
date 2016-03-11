@@ -1,0 +1,21 @@
+{
+  "name": "300",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "A.G.",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^1.4.0",
+    "body-parser": "^1.13.3",
+    "express": "^4.13.3",
+    "express-session": "^1.11.3",
+    "mongodb": "^2.0.39",
+    "passport": "^0.2.2",
+    "passport-google-oauth": "^0.2.0",
+    "request": "^2.60.0"
+  }
+}

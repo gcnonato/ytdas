@@ -1,0 +1,13 @@
+{
+    "client":{
+        "owner": "gcnonato",
+        "headerImage": "http://300ent.com/wp-content/uploads/2015/08/skull-ONLY.png",
+        "logo": "http://300ent.com/wp-content/themes/300/assets/img/300_logo_black.svg"
+    },
+    "server":{
+        "callback": "http://localhost:9000/auth/callback",
+        "clientId": "1067195703515-vadu6hsl78en28n33cffv80bupuoqgpr.apps.googleusercontent.com",
+        "clientSecret": "GD-Q4-a-3mh8lKb5G0SjqUV0",
+        "sessionSecret": "AIzaSyAApS8o2dUXkhdGSN3A4YqHquaoOFjnVlQ"
+    }
+}

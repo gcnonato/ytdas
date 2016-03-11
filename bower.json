@@ -1,0 +1,36 @@
+{
+  "name": "300",
+  "version": "0.0.0",
+  "authors": [
+    "agreen757 <dominion.green@gmail.com>"
+  ],
+  "description": "Polymer and YouTube project",
+  "moduleType": [
+    "es6",
+    "node"
+  ],
+  "keywords": [
+    "polymer",
+    "youtube"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/agreen757/youtubeAnalyticsDashboard",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "core-ajax": "Polymer/core-ajax#~0.5.6",
+    "core-scroll-header-panel": "Polymer/core-scroll-header-panel#~0.5.6",
+    "d3": "~3.5.6",
+    "jquery": "~2.1.4",
+    "paper-dialog": "Polymer/paper-dialog#~0.5.6",
+    "paper-fab": "Polymer/paper-fab#~0.5.6",
+    "paper-shadow": "Polymer/paper-shadow#~0.5.6",
+    "paper-spinner": "Polymer/paper-spinner#~0.5.6",
+    "polymer": "Polymer/polymer#^0.5"
+  }
+}
