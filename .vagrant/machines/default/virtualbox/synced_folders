@@ -1,1 +1,1 @@
-{"virtualbox":{"/vagrant":{"guestpath":"/vagrant","hostpath":"/Users/adriangreen/Downloads/working_files/300","disabled":false}}}
+{"virtualbox":{"/vagrant":{"guestpath":"/vagrant","hostpath":"C:/HashiCorp/Vagrant/bin","disabled":false,"__vagrantfile":true}}}
